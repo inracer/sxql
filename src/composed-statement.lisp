@@ -99,10 +99,12 @@
                                       with-table-names
                                       clause-a
                                       (not (stringp clause-a))
-                                      (select-statement-table-name (scoped-clause-statement clause-a)))
+                                      (select-statement-table-name
+                                        (scoped-clause-statement clause-a)))
                    :table-name-b (and (not non-scope-clause-p)
                                       with-table-names
-                                      (select-statement-table-name (scoped-clause-statement clause-b))))))
+                                      (select-statement-table-name
+                                        (scoped-clause-statement clause-b))))))
 
 (defmethod yield ((statement composed-statement))
   (unless (composed-statement-statements statement)
@@ -119,9 +121,11 @@
                              (appending (select-statement-clause-order stmt)))))
            (grouped-clauses (sort-plist-by-key
                              (group-by #'scoped-clause-type
-                                       (iter (for stmt in (composed-statement-statements statement))
+                                       (iter (for stmt in
+                                              (composed-statement-statements statement))
                                          (appending
-                                          (iter (for child in (compute-select-statement-children stmt))
+                                          (iter (for child in
+                                                 (compute-select-statement-children stmt))
                                             (when (typep child 'join-clause)
                                               (setf has-join-clause-p t))
                                             (collect (make-scoped-clause child stmt))))))
@@ -136,14 +140,18 @@
                 (iter (for (type scoped-clauses) on grouped-clauses :by #'cddr)
                   (when (and (eq type 'fields-clause)
                              (some (lambda (clause)
-                                     (and (null (select-statement-table-name (scoped-clause-statement clause)))
+                                     (and (null (select-statement-table-name
+                                                  (scoped-clause-statement clause)))
                                           (some (lambda (field)
                                                   (string= "*"
                                                            (typecase field
-                                                             (as-op (sql-symbol-name (as-op-right field)))
-                                                             (sql-symbol (sql-symbol-name field)))))
+                                                             (as-op (sql-symbol-name
+                                                                      (as-op-right field)))
+                                                             (sql-symbol
+                                                               (sql-symbol-name field)))))
                                                 (sql-splicing-list-elements
-                                                 (fields-clause-statement (scoped-clause-clause clause))))))
+                                                 (fields-clause-statement
+                                                   (scoped-clause-clause clause))))))
                                    scoped-clauses))
                     (setf scoped-clauses (list (make-scoped-clause
                                                 (make-clause :fields :*)
