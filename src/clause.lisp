@@ -41,9 +41,12 @@
                             (:constructor make-order-by-clause (&rest expressions))))
 
 @export
-(defstruct (limit-clause (:include expression-list-clause (name "LIMIT"))
-                         (:constructor make-limit-clause (count1 &optional count2
-                                                          &aux (expressions `(,count1 ,@(and count2 (list count2)))))))
+(defstruct (limit-clause
+             (:include expression-list-clause (name "LIMIT"))
+             (:constructor make-limit-clause (count1 &optional count2
+                                              &aux (expressions
+                                                `(,count1
+                                                   ,@(and count2 (list count2)))))))
   (count1 nil :type sql-variable)
   (count2 nil :type (or null sql-variable)))
 
@@ -53,8 +56,9 @@
   (offset nil :type sql-variable))
 
 @export
-(defstruct (group-by-clause (:include expression-list-clause (name "GROUP BY"))
-                            (:constructor make-group-by-clause (&rest expressions))))
+(defstruct (group-by-clause
+             (:include expression-list-clause (name "GROUP BY"))
+             (:constructor make-group-by-clause (&rest expressions))))
 
 @export
 (defstruct (join-clause (:include statement-clause)
@@ -110,26 +114,32 @@
     (call-next-method)))
 
 @export
-(defstruct (primary-key-clause (:include key-clause (name "PRIMARY KEY"))
-                               (:constructor make-primary-key-clause (expression))))
+(defstruct (primary-key-clause
+             (:include key-clause (name "PRIMARY KEY"))
+             (:constructor make-primary-key-clause (expression))))
 
 @export
-(defstruct (unique-key-clause (:include key-clause (name "UNIQUE"))
-                              (:constructor make-unique-key-clause (expression))))
+(defstruct (unique-key-clause
+             (:include key-clause (name "UNIQUE"))
+             (:constructor make-unique-key-clause (expression))))
 
 @export
-(defstruct (references-clause (:include expression-clause (name "REFERENCES"))
-                              (:constructor make-references-clause (table-name column-names
-                                                                    &aux (expression
-                                                                          (make-sql-splicing-expression-list table-name column-names)))))
+(defstruct (references-clause
+             (:include expression-clause (name "REFERENCES"))
+             (:constructor make-references-clause (table-name column-names
+                                                   &aux (expression
+                                                          (make-sql-splicing-expression-list table-name
+                                                                                             column-names)))))
   (table-name nil :type sql-symbol)
   (column-names nil :type sql-list))
 
 @export
-(defstruct (foreign-key-clause (:include expression-clause (name "FOREIGN KEY"))
-                               (:constructor make-foreign-key-clause (column-names references
-                                                                      &aux (expression
-                                                                            (make-sql-splicing-expression-list column-names references)))))
+(defstruct (foreign-key-clause
+             (:include expression-clause (name "FOREIGN KEY"))
+             (:constructor make-foreign-key-clause (column-names references
+                                                    &aux (expression
+                                                           (make-sql-splicing-expression-list column-names
+                                                                                              references)))))
   (column-names nil :type sql-list)
   (references nil :type references-clause))
 
@@ -321,7 +331,9 @@
          args))
 
 (defmethod make-clause ((clause-name (eql :alter-column)) &rest args)
-  (destructuring-bind (column-name &key type set-default drop-default (not-null :unspecified)) args
+  (destructuring-bind (column-name &key type set-default drop-default
+                       (not-null :unspecified))
+                      args
     (make-alter-column-clause (detect-and-convert column-name)
                               :type (and type
                                          (make-sql-column-type-from-list type))
